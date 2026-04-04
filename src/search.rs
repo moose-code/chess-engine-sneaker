@@ -60,6 +60,8 @@ pub struct Search {
     tt: Vec<TtEntry>,
     tt_mask: usize,
     history: [[i32; 64]; 64],
+    countermove: [[Option<Move>; 64]; 64],
+    stack_hash: [u64; 256],
     deadline: Option<Instant>,
     nodes: u64,
     stop: bool,
@@ -79,6 +81,8 @@ impl Search {
             tt: vec![TtEntry::default(); n],
             tt_mask: n - 1,
             history: [[0; 64]; 64],
+            countermove: [[None; 64]; 64],
+            stack_hash: [0; 256],
             deadline: None,
             nodes: 0,
             stop: false,
@@ -143,6 +147,49 @@ impl Search {
             | b.piece_bb[i][PieceType::Rook.idx()]
             | b.piece_bb[i][PieceType::Queen.idx()]
             != 0
+    }
+
+    #[inline]
+    fn update_history_good(&mut self, m: Move, bonus: i32) {
+        let f = m.from_sq().0 as usize;
+        let t = m.to_sq().0 as usize;
+        let h = &mut self.history[f][t];
+        // History gravity update to avoid runaway saturation.
+        *h += bonus - (*h * bonus.abs() / 16_384);
+        *h = (*h).clamp(-16_384, 16_384);
+    }
+
+    #[inline]
+    fn update_history_bad(&mut self, m: Move, malus: i32) {
+        let f = m.from_sq().0 as usize;
+        let t = m.to_sq().0 as usize;
+        let h = &mut self.history[f][t];
+        *h -= malus + (*h * malus.abs() / 16_384);
+        *h = (*h).clamp(-16_384, 16_384);
+    }
+
+    #[inline]
+    fn is_repetition(&self, b: &Board, ply: usize) -> bool {
+        if ply < 2 {
+            return false;
+        }
+        let key = b.hash();
+        let hm = b.halfmove_clock() as usize;
+        let start = ply.saturating_sub(hm);
+        let mut i = ply.saturating_sub(2);
+        loop {
+            if i < start {
+                break;
+            }
+            if self.stack_hash[i] == key {
+                return true;
+            }
+            if i < 2 {
+                break;
+            }
+            i -= 2;
+        }
+        false
     }
 
     /// Quiescence: noisy moves only when not in check; all evasions when in check.
@@ -225,10 +272,15 @@ impl Search {
         mut alpha: i32,
         mut beta: i32,
         ply: usize,
+        prev_move: Option<Move>,
         allow_null: bool,
         killers: &mut [[Option<Move>; 2]],
     ) -> i32 {
         if self.timed_out() {
+            return 0;
+        }
+        self.stack_hash[ply.min(255)] = b.hash();
+        if self.is_repetition(b, ply) {
             return 0;
         }
         self.nodes += 1;
@@ -269,7 +321,16 @@ impl Search {
         let in_check = b.in_check();
         if !in_check && allow_null && depth >= 3 && Self::has_big_piece(b, b.side_to_move()) {
             let n: NullMoveUndo = b.make_null();
-            let v = -self.negamax(b, depth - 1 - 2, -beta, -alpha, ply + 1, false, killers);
+            let v = -self.negamax(
+                b,
+                depth - 1 - 2,
+                -beta,
+                -alpha,
+                ply + 1,
+                None,
+                false,
+                killers,
+            );
             b.unmake_null(n);
             if self.stop {
                 return 0;
@@ -293,6 +354,11 @@ impl Search {
             let mut score = 0i32;
             if Some(*m) == tt_move {
                 score -= 1_000_000;
+            } else if let Some(pm) = prev_move {
+                let cm = self.countermove[pm.from_sq().0 as usize][pm.to_sq().0 as usize];
+                if cm == Some(*m) {
+                    score -= 700_000;
+                }
             } else if kp[0] == Some(*m) {
                 score -= 500_000;
             } else if kp[1] == Some(*m) {
@@ -302,7 +368,11 @@ impl Search {
                 let t = m.to_sq().0 as usize;
                 score -= self.history[f][t];
                 if let Some(v) = b.piece_at(m.to_sq()) {
-                    score -= 100 * piece_cap_val(v.pt);
+                    let a = b
+                        .piece_at(m.from_sq())
+                        .map(|p| p.pt)
+                        .unwrap_or(PieceType::Pawn);
+                    score -= 10_000 + 100 * piece_cap_val(v.pt) - piece_cap_val(a);
                 }
             }
             score
@@ -311,6 +381,8 @@ impl Search {
         let mut best: Option<Move> = None;
         let mut best_sc = i32::MIN / 2;
         let mut move_no = 0usize;
+        let mut quiet_tried: [Move; 64] = [Move(0); 64];
+        let mut quiet_len = 0usize;
 
         for m in buf {
             move_no += 1;
@@ -346,18 +418,36 @@ impl Search {
             let u = b.make_move(m);
             // Principal Variation Search: full window for first move, null window for the rest.
             let mut sc = if move_no == 1 {
-                -self.negamax(b, search_depth, -beta, -alpha, ply + 1, true, killers)
+                -self.negamax(b, search_depth, -beta, -alpha, ply + 1, Some(m), true, killers)
             } else {
                 let mut v =
-                    -self.negamax(b, search_depth, -alpha - 1, -alpha, ply + 1, true, killers);
+                    -self.negamax(
+                        b,
+                        search_depth,
+                        -alpha - 1,
+                        -alpha,
+                        ply + 1,
+                        Some(m),
+                        true,
+                        killers,
+                    );
                 if !self.stop && v > alpha && v < beta {
-                    v = -self.negamax(b, search_depth, -beta, -alpha, ply + 1, true, killers);
+                    v = -self.negamax(
+                        b,
+                        search_depth,
+                        -beta,
+                        -alpha,
+                        ply + 1,
+                        Some(m),
+                        true,
+                        killers,
+                    );
                 }
                 v
             };
             // If a reduced move unexpectedly improves alpha, re-search at full depth.
             if can_lmr && !self.stop && sc > alpha {
-                sc = -self.negamax(b, full_depth, -beta, -alpha, ply + 1, true, killers);
+                sc = -self.negamax(b, full_depth, -beta, -alpha, ply + 1, Some(m), true, killers);
             }
             b.unmake(u);
 
@@ -377,11 +467,22 @@ impl Search {
                     let pi = ply.min(63);
                     killers[pi][1] = killers[pi][0];
                     killers[pi][0] = Some(m);
-                    let f = m.from_sq().0 as usize;
-                    let t = m.to_sq().0 as usize;
-                    self.history[f][t] += (depth * depth) as i32;
+                    let bonus = (depth * depth).clamp(1, 256) as i32;
+                    self.update_history_good(m, bonus);
+                    if let Some(pm) = prev_move {
+                        self.countermove[pm.from_sq().0 as usize][pm.to_sq().0 as usize] = Some(m);
+                    }
+                    for q in quiet_tried.iter().take(quiet_len) {
+                        if *q != m {
+                            self.update_history_bad(*q, (bonus / 2).max(1));
+                        }
+                    }
                 }
                 break;
+            }
+            if !is_cap && quiet_len < quiet_tried.len() {
+                quiet_tried[quiet_len] = m;
+                quiet_len += 1;
             }
         }
 
@@ -447,7 +548,7 @@ impl Search {
 
             for m in buf.iter().copied() {
                 let u = b.make_move(m);
-                let sc = -self.negamax(b, d - 1, -beta, -alpha, 1, true, &mut killers);
+                let sc = -self.negamax(b, d - 1, -beta, -alpha, 1, None, true, &mut killers);
                 b.unmake(u);
                 if self.stop {
                     break;
@@ -471,7 +572,7 @@ impl Search {
                 local_best = None;
                 for m in buf.iter().copied() {
                     let u = b.make_move(m);
-                    let sc = -self.negamax(b, d - 1, -WIDE, -wide_a, 1, true, &mut killers);
+                    let sc = -self.negamax(b, d - 1, -WIDE, -wide_a, 1, None, true, &mut killers);
                     b.unmake(u);
                     if self.stop {
                         break;
