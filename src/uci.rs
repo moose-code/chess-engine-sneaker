@@ -62,7 +62,7 @@ pub fn run_uci_loop() {
                 }
                 while idx < tok.len() {
                     let mut legal = Vec::with_capacity(256);
-                    MoveGen::gen_legal(&mut legal, &b);
+                    MoveGen::gen_legal(&mut legal, &mut b);
                     if let Some(m) = legal.into_iter().find(|m| m.to_uci() == tok[idx]) {
                         let _undo = b.make_move(m);
                     } else {
@@ -161,7 +161,7 @@ pub fn run_uci_loop() {
                     writeln!(out, "bestmove {}", bm.to_uci()).ok();
                 } else {
                     let mut buf = Vec::with_capacity(256);
-                    MoveGen::gen_legal(&mut buf, &board);
+                    MoveGen::gen_legal(&mut buf, &mut board);
                     if let Some(m) = buf.first() {
                         writeln!(out, "bestmove {}", m.to_uci()).ok();
                     } else {

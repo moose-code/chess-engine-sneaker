@@ -309,7 +309,7 @@ impl MoveGen {
         b.piece_at(m.to_sq()).is_some()
     }
 
-    pub fn gen_noisy_legal(out: &mut Vec<Move>, b: &Board) {
+    pub fn gen_noisy_legal(out: &mut Vec<Move>, b: &mut Board) {
         let us = b.stm;
         Self::gen_pseudo_legal(out, b);
         let mut i = 0usize;
@@ -319,9 +319,10 @@ impl MoveGen {
                 out.swap_remove(i);
                 continue;
             }
-            let mut nb = b.clone();
-            nb.make_move(m);
-            if nb.sq_attacked(nb.king_sq(us), us.flip()) {
+            let u = b.make_move(m);
+            let illegal = b.sq_attacked(b.king_sq(us), us.flip());
+            b.unmake(u);
+            if illegal {
                 out.swap_remove(i);
             } else {
                 i += 1;
@@ -329,15 +330,16 @@ impl MoveGen {
         }
     }
 
-    pub fn gen_legal(out: &mut Vec<Move>, b: &Board) {
+    pub fn gen_legal(out: &mut Vec<Move>, b: &mut Board) {
         let us = b.stm;
         Self::gen_pseudo_legal(out, b);
         let mut i = 0usize;
         while i < out.len() {
             let m = out[i];
-            let mut nb = b.clone();
-            nb.make_move(m);
-            if nb.sq_attacked(nb.king_sq(us), us.flip()) {
+            let u = b.make_move(m);
+            let illegal = b.sq_attacked(b.king_sq(us), us.flip());
+            b.unmake(u);
+            if illegal {
                 out.swap_remove(i);
             } else {
                 i += 1;

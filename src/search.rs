@@ -314,7 +314,7 @@ impl Search {
 
         for m in buf {
             move_no += 1;
-            let mut next_depth = depth - 1;
+            let mut full_depth = depth - 1;
             let is_cap = b.piece_at(m.to_sq()).is_some() || m.is_en_passant();
             let gives_check = {
                 let u = b.make_move(m);
@@ -323,11 +323,12 @@ impl Search {
                 c
             };
             if gives_check {
-                next_depth += 1;
+                full_depth += 1;
             }
+            let mut search_depth = full_depth;
             let can_lmr = move_no > 3
                 && depth >= 3
-                && next_depth >= 1
+                && search_depth >= 1
                 && !in_check
                 && !is_cap
                 && !gives_check
@@ -336,22 +337,28 @@ impl Search {
                 && !m.is_castle_ooo();
             if can_lmr {
                 let r = 1 + (depth / 8).min(3);
-                next_depth -= r;
-                if next_depth < 0 {
-                    next_depth = 0;
+                search_depth -= r;
+                if search_depth < 0 {
+                    search_depth = 0;
                 }
             }
 
             let u = b.make_move(m);
-            let sc = -self.negamax(
-                b,
-                next_depth,
-                -beta,
-                -alpha,
-                ply + 1,
-                true,
-                killers,
-            );
+            // Principal Variation Search: full window for first move, null window for the rest.
+            let mut sc = if move_no == 1 {
+                -self.negamax(b, search_depth, -beta, -alpha, ply + 1, true, killers)
+            } else {
+                let mut v =
+                    -self.negamax(b, search_depth, -alpha - 1, -alpha, ply + 1, true, killers);
+                if !self.stop && v > alpha && v < beta {
+                    v = -self.negamax(b, search_depth, -beta, -alpha, ply + 1, true, killers);
+                }
+                v
+            };
+            // If a reduced move unexpectedly improves alpha, re-search at full depth.
+            if can_lmr && !self.stop && sc > alpha {
+                sc = -self.negamax(b, full_depth, -beta, -alpha, ply + 1, true, killers);
+            }
             b.unmake(u);
 
             if self.stop {
