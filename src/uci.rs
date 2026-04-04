@@ -3,7 +3,7 @@
 use crate::board::Board;
 use crate::movegen::MoveGen;
 use crate::search::Search;
-use crate::types::{Color, Move};
+use crate::types::Color;
 use std::io::{self, BufRead, Write};
 use std::time::Duration;
 
@@ -61,8 +61,13 @@ pub fn run_uci_loop() {
                     idx += 1;
                 }
                 while idx < tok.len() {
-                    if let Ok(m) = Move::from_uci(tok[idx]) {
+                    let mut legal = Vec::with_capacity(256);
+                    MoveGen::gen_legal(&mut legal, &b);
+                    if let Some(m) = legal.into_iter().find(|m| m.to_uci() == tok[idx]) {
                         let _undo = b.make_move(m);
+                    } else {
+                        // Invalid move list from GUI/CLI: stop replay to avoid board desync.
+                        break;
                     }
                     idx += 1;
                 }

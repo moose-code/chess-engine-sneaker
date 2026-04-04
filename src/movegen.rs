@@ -108,7 +108,8 @@ impl MoveGen {
 
         let pawn_push_dir: i8 = if us == Color::White { 1 } else { -1 };
         let start_rank: i8 = if us == Color::White { 1 } else { 6 };
-        let promo_rank: i8 = if us == Color::White { 6 } else { 1 };
+        // Destination rank that triggers promotion (0-based).
+        let promo_rank: i8 = if us == Color::White { 7 } else { 0 };
 
         let mut pawns = b.piece_bb[us.idx()][PieceType::Pawn.idx()];
         while pawns != 0 {
