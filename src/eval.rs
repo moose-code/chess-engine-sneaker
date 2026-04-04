@@ -2,6 +2,7 @@
 
 use crate::board::Board;
 use crate::types::{Color, PieceType};
+use std::fs;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct TaperedScore {
@@ -34,6 +35,19 @@ pub struct EvalWeights {
     pub doubled_eg: i32,
     pub isolated_mg: i32,
     pub isolated_eg: i32,
+    pub mobility_knight_mg: i32,
+    pub mobility_knight_eg: i32,
+    pub mobility_bishop_mg: i32,
+    pub mobility_bishop_eg: i32,
+    pub mobility_rook_mg: i32,
+    pub mobility_rook_eg: i32,
+    pub mobility_queen_mg: i32,
+    pub mobility_queen_eg: i32,
+    pub king_shield_mg: i32,
+    pub king_ring_attack_mg: i32,
+    pub passed_rank_mg: i32,
+    pub passed_rank_eg: i32,
+    pub passed_kingdist_eg: i32,
 }
 
 impl Default for EvalWeights {
@@ -55,15 +69,32 @@ impl EvalWeights {
             doubled_eg: -18,
             isolated_mg: -8,
             isolated_eg: -15,
+            mobility_knight_mg: 4,
+            mobility_knight_eg: 3,
+            mobility_bishop_mg: 4,
+            mobility_bishop_eg: 4,
+            mobility_rook_mg: 2,
+            mobility_rook_eg: 3,
+            mobility_queen_mg: 1,
+            mobility_queen_eg: 2,
+            king_shield_mg: 10,
+            king_ring_attack_mg: 8,
+            passed_rank_mg: 5,
+            passed_rank_eg: 12,
+            passed_kingdist_eg: 4,
         };
         init_default_pst(&mut w);
         w
     }
 
-    /// Flat order: piece_mg×6, piece_eg×6, pst_mg 6×64, pst_eg 6×64, passed_mg,eg, doubled_mg,eg, isolated_mg,eg
+    /// Flat order: piece_mg×6, piece_eg×6, pst_mg 6×64, pst_eg 6×64, then
+    /// [passed_mg, passed_eg, doubled_mg, doubled_eg, isolated_mg, isolated_eg,
+    ///  mobility_knight_mg, mobility_knight_eg, mobility_bishop_mg, mobility_bishop_eg,
+    ///  mobility_rook_mg, mobility_rook_eg, mobility_queen_mg, mobility_queen_eg,
+    ///  king_shield_mg, king_ring_attack_mg, passed_rank_mg, passed_rank_eg, passed_kingdist_eg]
     pub fn apply_from_i32_slice(&mut self, data: &[i32]) {
-        const N: usize = 6 + 6 + 6 * 64 + 6 * 64 + 6;
-        if data.len() < N {
+        const BASE_N: usize = 6 + 6 + 6 * 64 + 6 * 64 + 6;
+        if data.len() < BASE_N {
             return;
         }
         let mut i = 0usize;
@@ -93,7 +124,73 @@ impl EvalWeights {
         self.doubled_eg = data[i + 3];
         self.isolated_mg = data[i + 4];
         self.isolated_eg = data[i + 5];
+        i += 6;
+        if data.len() >= BASE_N + 13 {
+            self.mobility_knight_mg = data[i];
+            self.mobility_knight_eg = data[i + 1];
+            self.mobility_bishop_mg = data[i + 2];
+            self.mobility_bishop_eg = data[i + 3];
+            self.mobility_rook_mg = data[i + 4];
+            self.mobility_rook_eg = data[i + 5];
+            self.mobility_queen_mg = data[i + 6];
+            self.mobility_queen_eg = data[i + 7];
+            self.king_shield_mg = data[i + 8];
+            self.king_ring_attack_mg = data[i + 9];
+            self.passed_rank_mg = data[i + 10];
+            self.passed_rank_eg = data[i + 11];
+            self.passed_kingdist_eg = data[i + 12];
+        }
     }
+
+    pub fn to_flat_i32_vec(&self) -> Vec<i32> {
+        let mut out = Vec::with_capacity(6 + 6 + 6 * 64 + 6 * 64 + 6 + 13);
+        out.extend(self.piece_mg);
+        out.extend(self.piece_eg);
+        for p in 0..6 {
+            out.extend(self.pst_mg[p]);
+        }
+        for p in 0..6 {
+            out.extend(self.pst_eg[p]);
+        }
+        out.extend([
+            self.passed_mg,
+            self.passed_eg,
+            self.doubled_mg,
+            self.doubled_eg,
+            self.isolated_mg,
+            self.isolated_eg,
+            self.mobility_knight_mg,
+            self.mobility_knight_eg,
+            self.mobility_bishop_mg,
+            self.mobility_bishop_eg,
+            self.mobility_rook_mg,
+            self.mobility_rook_eg,
+            self.mobility_queen_mg,
+            self.mobility_queen_eg,
+            self.king_shield_mg,
+            self.king_ring_attack_mg,
+            self.passed_rank_mg,
+            self.passed_rank_eg,
+            self.passed_kingdist_eg,
+        ]);
+        out
+    }
+}
+
+pub fn load_weights_from_file(path: &str) -> Option<EvalWeights> {
+    let txt = fs::read_to_string(path).ok()?;
+    let mut vals = Vec::new();
+    for t in txt.split_whitespace() {
+        if let Ok(v) = t.parse::<i32>() {
+            vals.push(v);
+        }
+    }
+    if vals.is_empty() {
+        return None;
+    }
+    let mut w = EvalWeights::default();
+    w.apply_from_i32_slice(&vals);
+    Some(w)
 }
 
 fn set_pst_row(tab_mg: &mut [i32; 64], tab_eg: &mut [i32; 64], rank: u8, mg: &[i32; 8], eg: &[i32; 8]) {
@@ -265,6 +362,41 @@ fn sq_flip(sq: usize, c: Color) -> usize {
     }
 }
 
+#[inline]
+fn bit(sq: usize) -> u64 {
+    1u64 << sq
+}
+
+fn slider_attacks(occ: u64, sq: usize, dirs: &[(i8, i8)]) -> u64 {
+    let mut out = 0u64;
+    let pr = (sq / 8) as i8;
+    let pf = (sq % 8) as i8;
+    for &(dr, df) in dirs {
+        let mut r = pr + dr;
+        let mut f = pf + df;
+        while (0..=7).contains(&r) && (0..=7).contains(&f) {
+            let s = (r as usize) * 8 + f as usize;
+            let b = bit(s);
+            out |= b;
+            if occ & b != 0 {
+                break;
+            }
+            r += dr;
+            f += df;
+        }
+    }
+    out
+}
+
+#[inline]
+fn manhattan_sq(a: usize, b: usize) -> i32 {
+    let ar = (a / 8) as i32;
+    let af = (a % 8) as i32;
+    let br = (b / 8) as i32;
+    let bf = (b % 8) as i32;
+    (ar - br).abs() + (af - bf).abs()
+}
+
 fn pawn_structure(b: &Board, w: &EvalWeights, us: Color) -> TaperedScore {
     let mut s = TaperedScore::default();
     let our = b.piece_bb[us.idx()][PieceType::Pawn.idx()];
@@ -314,8 +446,17 @@ fn pawn_structure(b: &Board, w: &EvalWeights, us: Color) -> TaperedScore {
             rr += dir;
         }
         if passed {
-            s.mg += w.passed_mg;
-            s.eg += w.passed_eg;
+            let adv_rank = if us == Color::White {
+                r as i32
+            } else {
+                (7 - r) as i32
+            };
+            s.mg += w.passed_mg + w.passed_rank_mg * adv_rank;
+            s.eg += w.passed_eg + w.passed_rank_eg * adv_rank;
+            let my_k = b.king_sq(us).0 as usize;
+            let op_k = b.king_sq(us.flip()).0 as usize;
+            let d = manhattan_sq(op_k, sq) - manhattan_sq(my_k, sq);
+            s.eg += w.passed_kingdist_eg * d;
         }
     }
     s
@@ -326,6 +467,7 @@ pub fn evaluate_white_pov(b: &Board, w: &EvalWeights) -> i32 {
     let mut acc = TaperedScore::default();
     for c in [Color::White, Color::Black] {
         let sign = if c == Color::White { 1 } else { -1 };
+        let own_occ = if c == Color::White { b.white } else { b.black };
         for pt in [
             PieceType::Pawn,
             PieceType::Knight,
@@ -342,6 +484,58 @@ pub fn evaluate_white_pov(b: &Board, w: &EvalWeights) -> i32 {
                 let pti = pt.idx();
                 acc.mg += sign * (w.piece_mg[pti] + w.pst_mg[pti][idx]);
                 acc.eg += sign * (w.piece_eg[pti] + w.pst_eg[pti][idx]);
+                let mob = match pt {
+                    PieceType::Knight => {
+                        (crate::movegen::KNIGHT_ATTACKS[sq] & !own_occ).count_ones() as i32
+                    }
+                    PieceType::Bishop => (slider_attacks(
+                        b.occupied,
+                        sq,
+                        &[(1, 1), (1, -1), (-1, 1), (-1, -1)],
+                    ) & !own_occ)
+                        .count_ones() as i32,
+                    PieceType::Rook => (slider_attacks(
+                        b.occupied,
+                        sq,
+                        &[(1, 0), (-1, 0), (0, 1), (0, -1)],
+                    ) & !own_occ)
+                        .count_ones() as i32,
+                    PieceType::Queen => (slider_attacks(
+                        b.occupied,
+                        sq,
+                        &[
+                            (1, 1),
+                            (1, -1),
+                            (-1, 1),
+                            (-1, -1),
+                            (1, 0),
+                            (-1, 0),
+                            (0, 1),
+                            (0, -1),
+                        ],
+                    ) & !own_occ)
+                        .count_ones() as i32,
+                    _ => 0,
+                };
+                match pt {
+                    PieceType::Knight => {
+                        acc.mg += sign * w.mobility_knight_mg * mob;
+                        acc.eg += sign * w.mobility_knight_eg * mob;
+                    }
+                    PieceType::Bishop => {
+                        acc.mg += sign * w.mobility_bishop_mg * mob;
+                        acc.eg += sign * w.mobility_bishop_eg * mob;
+                    }
+                    PieceType::Rook => {
+                        acc.mg += sign * w.mobility_rook_mg * mob;
+                        acc.eg += sign * w.mobility_rook_eg * mob;
+                    }
+                    PieceType::Queen => {
+                        acc.mg += sign * w.mobility_queen_mg * mob;
+                        acc.eg += sign * w.mobility_queen_eg * mob;
+                    }
+                    _ => {}
+                }
             }
         }
         let ps = pawn_structure(b, w, c);
@@ -351,6 +545,67 @@ pub fn evaluate_white_pov(b: &Board, w: &EvalWeights) -> i32 {
             acc.mg -= ps.mg;
             acc.eg -= ps.eg;
         }
+
+        // King safety (middlegame-focused): own pawn shield and enemy pressure in king ring.
+        let ksq = b.king_sq(c).0 as usize;
+        let king_ring = crate::movegen::KING_ATTACKS[ksq] | bit(ksq);
+        let kr = (ksq / 8) as i32;
+        let kf = (ksq % 8) as i32;
+        let forward = if c == Color::White { 1 } else { -1 };
+        let shield_rank = kr + forward;
+        let mut shield = 0i32;
+        if (0..=7).contains(&shield_rank) {
+            for df in -1..=1 {
+                let nf = kf + df;
+                if !(0..=7).contains(&nf) {
+                    continue;
+                }
+                let s = shield_rank as usize * 8 + nf as usize;
+                if own_occ & bit(s) != 0
+                    && b.piece_bb[c.idx()][PieceType::Pawn.idx()] & bit(s) != 0
+                {
+                    shield += 1;
+                }
+            }
+        }
+        acc.mg += sign * w.king_shield_mg * shield;
+
+        let them = c.flip();
+        let mut pressure = 0i32;
+        let mut kn = b.piece_bb[them.idx()][PieceType::Knight.idx()];
+        while kn != 0 {
+            let sq = kn.trailing_zeros() as usize;
+            kn &= kn - 1;
+            pressure += (crate::movegen::KNIGHT_ATTACKS[sq] & king_ring).count_ones() as i32;
+        }
+        let mut bi = b.piece_bb[them.idx()][PieceType::Bishop.idx()];
+        while bi != 0 {
+            let sq = bi.trailing_zeros() as usize;
+            bi &= bi - 1;
+            pressure += (slider_attacks(b.occupied, sq, &[(1, 1), (1, -1), (-1, 1), (-1, -1)])
+                & king_ring)
+                .count_ones() as i32;
+        }
+        let mut rk = b.piece_bb[them.idx()][PieceType::Rook.idx()];
+        while rk != 0 {
+            let sq = rk.trailing_zeros() as usize;
+            rk &= rk - 1;
+            pressure += (slider_attacks(b.occupied, sq, &[(1, 0), (-1, 0), (0, 1), (0, -1)])
+                & king_ring)
+                .count_ones() as i32;
+        }
+        let mut qu = b.piece_bb[them.idx()][PieceType::Queen.idx()];
+        while qu != 0 {
+            let sq = qu.trailing_zeros() as usize;
+            qu &= qu - 1;
+            pressure += (slider_attacks(
+                b.occupied,
+                sq,
+                &[(1, 1), (1, -1), (-1, 1), (-1, -1), (1, 0), (-1, 0), (0, 1), (0, -1)],
+            ) & king_ring)
+                .count_ones() as i32;
+        }
+        acc.mg -= sign * w.king_ring_attack_mg * pressure;
     }
     let ph = phase_of(b);
     let egw = 24 - ph;

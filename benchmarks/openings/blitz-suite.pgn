@@ -1,0 +1,49 @@
+[Event "Italian"]
+[Site "?"]
+[Date "2026.01.01"]
+[Round "1"]
+[White "W"]
+[Black "B"]
+[Result "*"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 *
+
+[Event "QGD"]
+[Site "?"]
+[Date "2026.01.01"]
+[Round "2"]
+[White "W"]
+[Black "B"]
+[Result "*"]
+
+1. d4 d5 2. c4 e6 3. Nc3 Nf6 *
+
+[Event "Sicilian"]
+[Site "?"]
+[Date "2026.01.01"]
+[Round "3"]
+[White "W"]
+[Black "B"]
+[Result "*"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 *
+
+[Event "English"]
+[Site "?"]
+[Date "2026.01.01"]
+[Round "4"]
+[White "W"]
+[Black "B"]
+[Result "*"]
+
+1. c4 e5 2. Nc3 Nf6 3. g3 *
+
+[Event "French"]
+[Site "?"]
+[Date "2026.01.01"]
+[Round "5"]
+[White "W"]
+[Black "B"]
+[Result "*"]
+
+1. e4 e6 2. d4 d5 3. Nc3 Bb4 *

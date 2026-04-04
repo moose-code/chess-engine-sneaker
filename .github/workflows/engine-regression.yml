@@ -1,0 +1,19 @@
+name: engine-regression
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build
+        run: cargo build --release --target-dir target
+      - name: Unit and integration tests
+        run: cargo test --target-dir target
+      - name: Blunder bank
+        run: cargo test --target-dir target --test blunder_bank

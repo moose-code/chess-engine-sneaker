@@ -1,9 +1,12 @@
 //! UCI protocol loop, custom `perft`, debug helpers.
 
 use crate::board::Board;
+use crate::eval::load_weights_from_file;
 use crate::movegen::MoveGen;
+use crate::nnue::NnueModel;
 use crate::search::Search;
 use crate::types::Color;
+use std::fs;
 use std::io::{self, BufRead, Write};
 use std::time::Duration;
 
@@ -28,6 +31,21 @@ pub fn run_uci_loop() {
                 writeln!(
                     out,
                     "option name Hash type spin default 16 min 1 max 512"
+                )
+                .ok();
+                writeln!(
+                    out,
+                    "option name Threads type spin default 1 min 1 max 8"
+                )
+                .ok();
+                writeln!(
+                    out,
+                    "option name EvalWeightsFile type string default <empty>"
+                )
+                .ok();
+                writeln!(
+                    out,
+                    "option name NnueFile type string default <empty>"
                 )
                 .ok();
                 writeln!(out, "uciok").ok();
@@ -83,6 +101,30 @@ pub fn run_uci_loop() {
                     if let Ok(mb) = tok[4].parse::<usize>() {
                         search.set_tt_size(mb);
                     }
+                } else if tok.len() >= 5
+                    && tok[1] == "name"
+                    && tok[2] == "Threads"
+                    && tok[3] == "value"
+                {
+                    if let Ok(t) = tok[4].parse::<usize>() {
+                        search.set_threads(t);
+                    }
+                } else if tok.len() >= 5
+                    && tok[1] == "name"
+                    && tok[2] == "EvalWeightsFile"
+                    && tok[3] == "value"
+                {
+                    let path = tok[4..].join(" ");
+                    if let Some(w) = load_weights_from_file(path.trim()) {
+                        search.weights = w;
+                    }
+                } else if tok.len() >= 5
+                    && tok[1] == "name"
+                    && tok[2] == "NnueFile"
+                    && tok[3] == "value"
+                {
+                    let path = tok[4..].join(" ");
+                    search.set_nnue(NnueModel::load(path.trim()));
                 }
             }
             "go" => {
@@ -173,6 +215,19 @@ pub fn run_uci_loop() {
                 if let Some(d) = parts.next().and_then(|s| s.parse::<u32>().ok()) {
                     let n = MoveGen::perft(&mut board, d);
                     writeln!(out, "info string perft {} {}", d, n).ok();
+                }
+            }
+            "dumpweights" => {
+                if let Some(path) = parts.next() {
+                    let flat = search.weights.to_flat_i32_vec();
+                    let txt = flat
+                        .iter()
+                        .map(|v| v.to_string())
+                        .collect::<Vec<_>>()
+                        .join(" ");
+                    if fs::write(path, txt).is_ok() {
+                        writeln!(out, "info string dumped weights {}", path).ok();
+                    }
                 }
             }
             "d" | "display" => {

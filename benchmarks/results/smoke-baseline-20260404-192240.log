@@ -1,0 +1,42 @@
+Indexing opening suite...
+Warning: EngineB doesn't have option Threads
+Warning: EngineA doesn't have option Threads
+Started game 1 of 8 (EngineA vs EngineB)
+Finished game 1 (EngineA vs EngineB): 1-0 {White mates}
+Score of EngineA vs EngineB: 1 - 0 - 0  [1.000] 1
+Started game 2 of 8 (EngineB vs EngineA)
+Finished game 2 (EngineB vs EngineA): 1-0 {White mates}
+Score of EngineA vs EngineB: 1 - 1 - 0  [0.500] 2
+Started game 3 of 8 (EngineA vs EngineB)
+Finished game 3 (EngineA vs EngineB): 1/2-1/2 {Draw by 3-fold repetition}
+Score of EngineA vs EngineB: 1 - 1 - 1  [0.500] 3
+Started game 4 of 8 (EngineB vs EngineA)
+Finished game 4 (EngineB vs EngineA): 1-0 {White mates}
+Score of EngineA vs EngineB: 1 - 2 - 1  [0.375] 4
+Started game 5 of 8 (EngineA vs EngineB)
+Finished game 5 (EngineA vs EngineB): 1-0 {White mates}
+Score of EngineA vs EngineB: 2 - 2 - 1  [0.500] 5
+Started game 6 of 8 (EngineB vs EngineA)
+Finished game 6 (EngineB vs EngineA): 1-0 {White mates}
+Score of EngineA vs EngineB: 2 - 3 - 1  [0.417] 6
+Started game 7 of 8 (EngineA vs EngineB)
+Finished game 7 (EngineA vs EngineB): 1-0 {White mates}
+Score of EngineA vs EngineB: 3 - 3 - 1  [0.500] 7
+Started game 8 of 8 (EngineB vs EngineA)
+Finished game 8 (EngineB vs EngineA): 1-0 {White mates}
+Score of EngineA vs EngineB: 3 - 4 - 1  [0.438] 8
+...      EngineA playing White: 3 - 0 - 1  [0.875] 4
+...      EngineA playing Black: 0 - 4 - 0  [0.000] 4
+...      White vs Black: 7 - 0 - 1  [0.938] 8
+Elo difference: -43.7 +/- 275.0, LOS: 35.3 %, DrawRatio: 12.5 %
+SPRT: llr 0 (0.0%), lbound -inf, ubound inf
+
+Player: EngineA
+   "Draw by 3-fold repetition": 1
+   "Loss: White mates": 4
+   "Win: White mates": 3
+Player: EngineB
+   "Draw by 3-fold repetition": 1
+   "Loss: White mates": 3
+   "Win: White mates": 4
+Finished match

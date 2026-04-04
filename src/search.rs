@@ -3,7 +3,9 @@
 use crate::board::{Board, NullMoveUndo};
 use crate::eval::{evaluate, EvalWeights};
 use crate::movegen::MoveGen;
+use crate::nnue::NnueModel;
 use crate::types::{Color, Move, PieceType, Square};
+use std::thread;
 use std::time::{Duration, Instant};
 
 const TT_EXACT: u8 = 0;
@@ -55,8 +57,11 @@ impl Default for TtEntry {
     }
 }
 
+#[derive(Clone)]
 pub struct Search {
     pub weights: EvalWeights,
+    threads: usize,
+    nnue: Option<NnueModel>,
     tt: Vec<TtEntry>,
     tt_mask: usize,
     history: [[i32; 64]; 64],
@@ -78,6 +83,8 @@ impl Search {
         let n = 1 << 20;
         Self {
             weights: EvalWeights::default(),
+            threads: 1,
+            nnue: None,
             tt: vec![TtEntry::default(); n],
             tt_mask: n - 1,
             history: [[0; 64]; 64],
@@ -92,6 +99,27 @@ impl Search {
     #[inline]
     pub fn nodes(&self) -> u64 {
         self.nodes
+    }
+
+    pub fn set_threads(&mut self, t: usize) {
+        self.threads = t.clamp(1, 8);
+    }
+
+    pub fn set_nnue(&mut self, model: Option<NnueModel>) {
+        self.nnue = model;
+    }
+
+    #[inline]
+    fn eval_pos(&self, b: &Board) -> i32 {
+        let base = evaluate(b, &self.weights);
+        if let Some(n) = &self.nnue {
+            let w = n.eval_white_pov(b);
+            let nn = if b.side_to_move() == Color::Black { -w } else { w };
+            // Blend handcrafted and NNUE scores to keep fallback stability.
+            (2 * base + nn) / 3
+        } else {
+            base
+        }
     }
 
     pub fn set_deadline(&mut self, d: Option<Instant>) {
@@ -277,9 +305,9 @@ impl Search {
             }
         } else {
             if qdepth <= 0 {
-                return evaluate(b, &self.weights);
+                return self.eval_pos(b);
             }
-            let stand = evaluate(b, &self.weights);
+            let stand = self.eval_pos(b);
             if stand >= beta {
                 return beta;
             }
@@ -390,11 +418,22 @@ impl Search {
         }
 
         let in_check = b.in_check();
-        if !in_check && allow_null && depth >= 3 && Self::has_big_piece(b, b.side_to_move()) {
+        let static_eval = if in_check {
+            0
+        } else {
+            self.eval_pos(b)
+        };
+        if !in_check
+            && allow_null
+            && depth >= 3
+            && beta < MATE_BOUND
+            && static_eval >= beta
+            && Self::has_big_piece(b, b.side_to_move())
+        {
             let n: NullMoveUndo = b.make_null();
             let v = -self.negamax(
                 b,
-                depth - 1 - 2,
+                depth - 1 - (2 + depth / 4),
                 -beta,
                 -alpha,
                 ply + 1,
@@ -497,6 +536,12 @@ impl Search {
                 }
             }
             let mut search_depth = full_depth;
+            if !in_check && !is_cap && !gives_check && depth <= 3 {
+                let fut_margin = 120 * depth;
+                if static_eval + fut_margin <= alpha {
+                    continue;
+                }
+            }
             let can_lmr = move_no > 3
                 && depth >= 3
                 && search_depth >= 1
@@ -607,6 +652,9 @@ impl Search {
     }
 
     pub fn best_move(&mut self, b: &mut Board, max_depth: i32) -> Option<(Move, i32)> {
+        if self.threads > 1 {
+            return self.best_move_smp(b, max_depth);
+        }
         self.nodes = 0;
         self.stop = false;
         let mut global_best: Option<Move> = None;
@@ -699,6 +747,103 @@ impl Search {
             }
 
             if self.stop {
+                break;
+            }
+        }
+        global_best.map(|m| (m, global_sc))
+    }
+
+    fn best_move_smp(&mut self, b: &mut Board, max_depth: i32) -> Option<(Move, i32)> {
+        self.nodes = 0;
+        self.stop = false;
+        let mut global_best: Option<Move> = None;
+        let mut global_sc = 0i32;
+        let workers = self.threads.clamp(1, 8);
+        const WIDE: i32 = 50_000;
+
+        for d in 1..=max_depth {
+            if self.timed_out() {
+                break;
+            }
+            let mut root = Vec::with_capacity(256);
+            MoveGen::gen_legal(&mut root, b);
+            if root.is_empty() {
+                return None;
+            }
+            if let Some(mb) = global_best {
+                if let Some(i) = root.iter().position(|m| *m == mb) {
+                    root.swap(0, i);
+                }
+            }
+            let nthreads = workers.min(root.len());
+            let root_moves = root.clone();
+            let deadline = self.deadline;
+            let base_self = self.clone();
+            let base_board = b.clone();
+
+            let mut results = Vec::new();
+            thread::scope(|scope| {
+                let mut handles = Vec::new();
+                for tid in 0..nthreads {
+                    let moves: Vec<Move> = root_moves.iter().copied().skip(tid).step_by(nthreads).collect();
+                    let mut local = base_self.clone();
+                    local.threads = 1;
+                    local.stop = false;
+                    local.deadline = deadline;
+                    let mut lb = base_board.clone();
+                    handles.push(scope.spawn(move || {
+                        let mut best_m = None;
+                        let mut best_s = i32::MIN / 2;
+                        let mut killers = [[None, None]; 64];
+                        for m in moves {
+                            if local.timed_out() {
+                                break;
+                            }
+                            let u = lb.make_move(m);
+                            let s = -local.negamax(
+                                &mut lb,
+                                d - 1,
+                                -WIDE,
+                                WIDE,
+                                1,
+                                None,
+                                true,
+                                &mut killers,
+                            );
+                            lb.unmake(u);
+                            if s > best_s {
+                                best_s = s;
+                                best_m = Some(m);
+                            }
+                        }
+                        (best_m, best_s, local.nodes)
+                    }));
+                }
+                for h in handles {
+                    if let Ok(v) = h.join() {
+                        results.push(v);
+                    }
+                }
+            });
+
+            let mut local_best = None;
+            let mut local_sc = i32::MIN / 2;
+            let mut node_sum = 0u64;
+            for (m, s, n) in results {
+                node_sum = node_sum.saturating_add(n);
+                if let Some(mm) = m {
+                    if s > local_sc {
+                        local_sc = s;
+                        local_best = Some(mm);
+                    }
+                }
+            }
+            self.nodes = self.nodes.saturating_add(node_sum);
+            if local_best.is_some() {
+                global_best = local_best;
+                global_sc = local_sc;
+            }
+            if self.timed_out() {
                 break;
             }
         }

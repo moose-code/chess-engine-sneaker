@@ -1,0 +1,20 @@
+Indexing opening suite...
+Started game 1 of 2 (EngineA vs EngineB)
+Finished game 1 (EngineA vs EngineB): 1/2-1/2 {Draw by 3-fold repetition}
+Score of EngineA vs EngineB: 0 - 0 - 1  [0.500] 1
+Started game 2 of 2 (EngineB vs EngineA)
+Finished game 2 (EngineB vs EngineA): 0-1 {Black mates}
+Score of EngineA vs EngineB: 1 - 0 - 1  [0.750] 2
+...      EngineA playing White: 0 - 0 - 1  [0.500] 1
+...      EngineA playing Black: 1 - 0 - 0  [1.000] 1
+...      White vs Black: 0 - 1 - 1  [0.250] 2
+Elo difference: 190.8 +/- nan, LOS: 84.1 %, DrawRatio: 50.0 %
+SPRT: llr 0 (0.0%), lbound -inf, ubound inf
+
+Player: EngineA
+   "Draw by 3-fold repetition": 1
+   "Win: Black mates": 1
+Player: EngineB
+   "Draw by 3-fold repetition": 1
+   "Loss: Black mates": 1
+Finished match

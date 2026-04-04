@@ -1,0 +1,71 @@
+[Event "?"]
+[Site "?"]
+[Date "2026.04.04"]
+[Round "1"]
+[White "EngineA"]
+[Black "EngineB"]
+[Result "1/2-1/2"]
+[ECO "C15"]
+[GameDuration "00:00:05"]
+[GameEndTime "2026-04-04T19:41:14.039 GMT+1"]
+[GameStartTime "2026-04-04T19:41:08.150 GMT+1"]
+[Opening "French"]
+[PlyCount "72"]
+[TimeControl "3+0.1"]
+[Variation "Winawer (Nimzowitsch) variation"]
+
+1. e4 {book} e6 {book} 2. d4 {book} d5 {book} 3. Nc3 {book} Bb4 {book}
+4. Qg4 {0.16s} Kf8 {0.16s} 5. e5 {0.16s} h5 {0.16s} 6. Qg5 {0.15s} Qxg5 {0.15s}
+7. Bxg5 {0.048s} Nc6 {0.12s} 8. Nf3 {0.11s} Nge7 {0.15s} 9. a3 {0.15s}
+Bxc3+ {0.15s} 10. bxc3 {0.026s} Nf5 {0.069s} 11. Bd3 {0.12s} a5 {0.15s}
+12. Kd2 {0.15s} Bd7 {0.14s} 13. Rhe1 {0.15s} a4 {0.14s} 14. Nh4 {0.15s}
+Nfe7 {0.14s} 15. Rab1 {0.11s} b6 {0.14s} 16. h3 {0.14s} Bc8 {0.14s}
+17. Bb5 {0.14s} Bb7 {0.13s} 18. g3 {0.14s} Ra5 {0.13s} 19. Nf3 {0.14s}
+Ba6 {0.13s} 20. Bxe7+ {0.14s} Nxe7 {0.036s} 21. Bxa6 {0.049s} Rxa6 {0.016s}
+22. Kd3 {0.049s} Nf5 {0.039s} 23. c4 {0.050s} Ke7 {0.075s} 24. cxd5 {0.067s}
+exd5 {0.048s} 25. g4 {0.073s} hxg4 {0.012s} 26. hxg4 {0.023s} Rh3 {0.038s}
+27. gxf5 {0.069s} Rxf3+ {0.017s} 28. Re3 {0.026s} Rxf5 {0.027s} 29. f3 {0.11s}
+c5 {0.025s} 30. Rg1 {0.055s} Rf4 {0.040s} 31. c3 {0.033s} g6 {0.056s}
+32. e6 {0.063s} Ra7 {0.049s} 33. Rg5 {0.079s} Rf5 {0.12s} 34. Rg1 {0.055s}
+Rf4 {0.059s} 35. Rg5 {0s} Rf5 {0s} 36. Rg1 {0.003s}
+Rf4 {0s, Draw by 3-fold repetition} 1/2-1/2
+
+[Event "?"]
+[Site "?"]
+[Date "2026.04.04"]
+[Round "1"]
+[White "EngineB"]
+[Black "EngineA"]
+[Result "0-1"]
+[ECO "C15"]
+[GameDuration "00:00:07"]
+[GameEndTime "2026-04-04T19:41:21.867 GMT+1"]
+[GameStartTime "2026-04-04T19:41:14.040 GMT+1"]
+[Opening "French"]
+[PlyCount "112"]
+[TimeControl "3+0.1"]
+[Variation "Winawer (Nimzowitsch) variation"]
+
+1. e4 {book} e6 {book} 2. d4 {book} d5 {book} 3. Nc3 {book} Bb4 {book}
+4. Qg4 {0.16s} Kf8 {0.16s} 5. e5 {0.16s} h5 {0.16s} 6. Qg5 {0.15s} f6 {0.15s}
+7. Qf4 {0.15s} c5 {0.15s} 8. Nf3 {0.15s} Nc6 {0.15s} 9. dxc5 {0.15s} d4 {0.15s}
+10. a3 {0.14s} Qa5 {0.14s} 11. axb4 {0.14s} Qxa1 {0.14s} 12. Ne4 {0.14s}
+Nxb4 {0.14s} 13. Nxd4 {0.14s} Nd5 {0.14s} 14. Nb3 {0.14s} Nxf4 {0.14s}
+15. Nxa1 {0.067s} fxe5 {0.065s} 16. g3 {0.096s} Nd5 {0.051s} 17. Nb3 {0.066s}
+Ngf6 {0.061s} 18. Bg2 {0.061s} Nxe4 {0.094s} 19. Bxe4 {0.013s} h4 {0.078s}
+20. O-O {0.14s} Kf7 {0.079s} 21. Na5 {0.14s} hxg3 {0.14s} 22. fxg3+ {0.091s}
+Kg8 {0.055s} 23. c4 {0.037s} Nf6 {0.016s} 24. Bxb7 {0.035s} Bxb7 {0.041s}
+25. Nxb7 {0.020s} Rc8 {0.084s} 26. Re1 {0.11s} Rc7 {0.13s} 27. Nd8 {0.037s}
+Rxc5 {0.085s} 28. b3 {0.013s} e4 {0.085s} 29. Be3 {0.070s} Ra5 {0.061s}
+30. Nxe6 {0.13s} Kf7 {0.12s} 31. Ng5+ {0.16s} Kg6 {0.036s} 32. Ne6 {0.13s}
+Ra2 {0.15s} 33. Bd4 {0.15s} Raxh2 {0.15s} 34. Nf4+ {0.15s} Kf7 {0.022s}
+35. Kf1 {0.15s} Rh1+ {0.093s} 36. Ke2 {0.039s} Rxe1+ {0.059s} 37. Kxe1 {0.024s}
+Rb8 {0.033s} 38. Bxa7 {0.020s} Rxb3 {0.016s} 39. Ne2 {0.056s} Rb4 {0.035s}
+40. c5 {0.023s} Rb7 {0.040s} 41. Bb6 {0.004s} Nd7 {0.007s} 42. Nc3 {0.005s}
+Nxb6 {0.022s} 43. cxb6 {0.006s} Rxb6 {0.005s} 44. Ke2 {0.008s} Rb2+ {0.007s}
+45. Ke3 {0.002s} Rb3 {0.003s} 46. Kd4 {0.004s} e3 {0.005s} 47. g4 {0.007s}
+g6 {0.024s} 48. g5 {0.006s} Ra3 {0.006s} 49. Nb5 {0.005s} e2 {0.021s}
+50. Na7 {0s} Rxa7 {0.055s} 51. Ke3 {0s} e1=Q+ {0.038s} 52. Kd4 {0.036s}
+Qb4+ {0.094s} 53. Kd3 {0.040s} Ra2 {0.053s} 54. Ke3 {0.016s} Ra3+ {0.044s}
+55. Kf2 {0.010s} Qb2+ {0.038s} 56. Kf1 {0.011s} Ra1# {0.022s, Black mates} 0-1
+

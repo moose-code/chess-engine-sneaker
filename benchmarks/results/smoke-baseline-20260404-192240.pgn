@@ -1,0 +1,259 @@
+[Event "?"]
+[Site "?"]
+[Date "2026.04.04"]
+[Round "1"]
+[White "EngineA"]
+[Black "EngineB"]
+[Result "1-0"]
+[ECO "A04"]
+[GameDuration "00:00:08"]
+[GameEndTime "2026-04-04T19:22:48.826 GMT+1"]
+[GameStartTime "2026-04-04T19:22:40.675 GMT+1"]
+[Opening "Reti Opening"]
+[PlyCount "77"]
+[TimeControl "3+0.1"]
+
+1. Nf3 {0.012s} Nc6 {0.010s} 2. d4 {0.025s} d5 {0.060s} 3. Nc3 {0.050s}
+Nf6 {0.11s} 4. Be3 {0.17s} Ng4 {0.17s} 5. Bg5 {0.17s} Bf5 {0.16s} 6. Qd2 {0.16s}
+f6 {0.16s} 7. Bh4 {0.16s} Nb4 {0.16s} 8. Rc1 {0.16s} g5 {0.15s} 9. Bg3 {0.15s}
+Kf7 {0.15s} 10. h3 {0.15s} Nh6 {0.15s} 11. Nb5 {0.15s} Nxa2 {0.15s}
+12. Ra1 {0.15s} g4 {0.14s} 13. hxg4 {0.14s} Bxg4 {0.14s} 14. Rxa2 {0.14s}
+c6 {0.14s} 15. Nxa7 {0.14s} Nf5 {0.14s} 16. Qf4 {0.14s} h5 {0.14s}
+17. c3 {0.14s} Qb6 {0.13s} 18. Qc7 {0.13s} Qb3 {0.13s} 19. Qa5 {0.13s}
+b6 {0.13s} 20. Qa6 {0.13s} Nxg3 {0.13s} 21. fxg3 {0.13s} Bc8 {0.13s}
+22. Qa3 {0.13s} Qxa3 {0.13s} 23. Rxa3 {0.13s} e6 {0.13s} 24. Nxc8 {0.13s}
+Bxa3 {0.097s} 25. Nxb6 {0.040s} Ra6 {0.049s} 26. bxa3 {0.035s} Rxb6 {0.061s}
+27. g4 {0.043s} Ra8 {0.13s} 28. gxh5 {0.10s} Rxa3 {0.057s} 29. Rh3 {0.084s}
+Rbb3 {0.060s} 30. h6 {0.10s} Rxc3 {0.067s} 31. h7 {0.032s} Rc1+ {0.093s}
+32. Kd2 {0.035s} Rxf1 {0.11s} 33. h8=Q {0.049s} Ra2+ {0.089s} 34. Kc3 {0.11s}
+Rc1+ {0.12s} 35. Kb3 {0.14s} Rxe2 {0.096s} 36. Ng5+ {0.075s} fxg5 {0.045s}
+37. Rf3+ {0.018s} Ke7 {0.019s} 38. Qf8+ {0.010s} Kd7 {0.004s}
+39. Rf7# {0.004s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.04.04"]
+[Round "1"]
+[White "EngineB"]
+[Black "EngineA"]
+[Result "1-0"]
+[ECO "A04"]
+[GameDuration "00:00:08"]
+[GameEndTime "2026-04-04T19:22:56.921 GMT+1"]
+[GameStartTime "2026-04-04T19:22:48.827 GMT+1"]
+[Opening "Reti Opening"]
+[PlyCount "77"]
+[TimeControl "3+0.1"]
+
+1. Nf3 {0.010s} Nc6 {0.010s} 2. d4 {0.025s} d5 {0.059s} 3. Nc3 {0.050s}
+Nf6 {0.11s} 4. Be3 {0.17s} Ng4 {0.17s} 5. Bg5 {0.17s} Bf5 {0.16s} 6. Qd2 {0.16s}
+f6 {0.16s} 7. Bh4 {0.16s} Nb4 {0.16s} 8. Rc1 {0.16s} g5 {0.15s} 9. Bg3 {0.15s}
+Kf7 {0.15s} 10. h3 {0.15s} Nh6 {0.15s} 11. Nb5 {0.15s} Nxa2 {0.15s}
+12. Ra1 {0.15s} g4 {0.14s} 13. hxg4 {0.14s} Bxg4 {0.14s} 14. Rxa2 {0.14s}
+c6 {0.14s} 15. Nxa7 {0.14s} Nf5 {0.14s} 16. Qf4 {0.14s} h5 {0.14s}
+17. c3 {0.14s} Qb6 {0.13s} 18. Qc7 {0.13s} Qb3 {0.13s} 19. Qa5 {0.13s}
+b6 {0.13s} 20. Qa6 {0.13s} Nxg3 {0.13s} 21. fxg3 {0.13s} Bc8 {0.13s}
+22. Qa3 {0.13s} Qxa3 {0.13s} 23. Rxa3 {0.13s} e6 {0.13s} 24. Nxc8 {0.13s}
+Bxa3 {0.095s} 25. Nxb6 {0.040s} Ra6 {0.048s} 26. bxa3 {0.034s} Rxb6 {0.061s}
+27. g4 {0.044s} Ra8 {0.13s} 28. gxh5 {0.10s} Rxa3 {0.054s} 29. Rh3 {0.085s}
+Rbb3 {0.060s} 30. h6 {0.10s} Rxc3 {0.064s} 31. h7 {0.031s} Rc1+ {0.094s}
+32. Kd2 {0.035s} Rxf1 {0.11s} 33. h8=Q {0.034s} Ra2+ {0.083s} 34. Kc3 {0.11s}
+Rc1+ {0.12s} 35. Kb3 {0.14s} Rxe2 {0.079s} 36. Ng5+ {0.071s} fxg5 {0.045s}
+37. Rf3+ {0.018s} Ke7 {0.019s} 38. Qf8+ {0.008s} Kd7 {0.004s}
+39. Rf7# {0.003s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.04.04"]
+[Round "1"]
+[White "EngineA"]
+[Black "EngineB"]
+[Result "1/2-1/2"]
+[ECO "A04"]
+[GameDuration "00:00:07"]
+[GameEndTime "2026-04-04T19:23:04.211 GMT+1"]
+[GameStartTime "2026-04-04T19:22:56.922 GMT+1"]
+[Opening "Reti Opening"]
+[PlyCount "67"]
+[TimeControl "3+0.1"]
+
+1. Nf3 {0.009s} Nc6 {0.010s} 2. d4 {0.025s} d5 {0.058s} 3. Nc3 {0.048s}
+Nf6 {0.11s} 4. Be3 {0.17s} Ng4 {0.17s} 5. Bg5 {0.17s} Bf5 {0.16s} 6. Qd2 {0.16s}
+f6 {0.16s} 7. Bh4 {0.16s} Nb4 {0.16s} 8. Rc1 {0.16s} g5 {0.15s} 9. Bg3 {0.15s}
+Kf7 {0.15s} 10. h3 {0.15s} Nh6 {0.15s} 11. Nb5 {0.15s} Nxa2 {0.15s}
+12. Ra1 {0.15s} g4 {0.14s} 13. hxg4 {0.14s} Bxg4 {0.14s} 14. Rxa2 {0.14s}
+c6 {0.14s} 15. Nxa7 {0.14s} Nf5 {0.14s} 16. Qf4 {0.14s} h5 {0.14s}
+17. c3 {0.14s} Qb6 {0.13s} 18. Qc7 {0.13s} Qb3 {0.13s} 19. Qa5 {0.13s}
+b6 {0.13s} 20. Qa6 {0.13s} Nxg3 {0.13s} 21. fxg3 {0.13s} Bc8 {0.13s}
+22. Qa3 {0.13s} Qxa3 {0.13s} 23. Rxa3 {0.13s} e6 {0.13s} 24. Nxc8 {0.13s}
+Bxa3 {0.095s} 25. Nxb6 {0.039s} Ra6 {0.047s} 26. bxa3 {0.035s} Rxb6 {0.061s}
+27. g4 {0.047s} Ra8 {0.13s} 28. gxh5 {0.10s} Rxa3 {0.055s} 29. Rh3 {0.080s}
+Rbb3 {0.061s} 30. Kd2 {0.13s} Ra2+ {0.081s} 31. Kd3 {0.065s} Raa3 {0.067s}
+32. Kd2 {0.031s} Ra2+ {0s} 33. Kd3 {0s} Raa3 {0s}
+34. Kd2 {0s, Draw by 3-fold repetition} 1/2-1/2
+
+[Event "?"]
+[Site "?"]
+[Date "2026.04.04"]
+[Round "1"]
+[White "EngineB"]
+[Black "EngineA"]
+[Result "1-0"]
+[ECO "A04"]
+[GameDuration "00:00:08"]
+[GameEndTime "2026-04-04T19:23:12.375 GMT+1"]
+[GameStartTime "2026-04-04T19:23:04.212 GMT+1"]
+[Opening "Reti Opening"]
+[PlyCount "77"]
+[TimeControl "3+0.1"]
+
+1. Nf3 {0.009s} Nc6 {0.010s} 2. d4 {0.024s} d5 {0.057s} 3. Nc3 {0.048s}
+Nf6 {0.15s} 4. Be3 {0.17s} Ng4 {0.16s} 5. Bg5 {0.17s} Bf5 {0.16s} 6. Qd2 {0.16s}
+f6 {0.16s} 7. Bh4 {0.16s} Nb4 {0.15s} 8. Rc1 {0.16s} g5 {0.15s} 9. Bg3 {0.15s}
+Kf7 {0.15s} 10. h3 {0.15s} Nh6 {0.15s} 11. Nb5 {0.15s} Nxa2 {0.14s}
+12. Ra1 {0.15s} g4 {0.14s} 13. hxg4 {0.14s} Bxg4 {0.14s} 14. Rxa2 {0.14s}
+c6 {0.14s} 15. Nxa7 {0.14s} Nf5 {0.14s} 16. Qf4 {0.14s} h5 {0.13s}
+17. c3 {0.14s} Qb6 {0.13s} 18. Qc7 {0.13s} Qb3 {0.13s} 19. Qa5 {0.13s}
+b6 {0.13s} 20. Qa6 {0.13s} Nxg3 {0.13s} 21. fxg3 {0.13s} Bc8 {0.13s}
+22. Qa3 {0.13s} Qxa3 {0.13s} 23. Rxa3 {0.13s} e6 {0.12s} 24. Nxc8 {0.13s}
+Bxa3 {0.099s} 25. Nxb6 {0.051s} Ra6 {0.054s} 26. bxa3 {0.037s} Rxb6 {0.061s}
+27. g4 {0.048s} Ra8 {0.13s} 28. gxh5 {0.11s} Rxa3 {0.057s} 29. Rh3 {0.083s}
+Rbb3 {0.063s} 30. h6 {0.10s} Rxc3 {0.081s} 31. h7 {0.032s} Rc1+ {0.095s}
+32. Kd2 {0.035s} Rxf1 {0.11s} 33. h8=Q {0.035s} Ra2+ {0.082s} 34. Kc3 {0.11s}
+Rc1+ {0.12s} 35. Kb3 {0.14s} Rxe2 {0.079s} 36. Ng5+ {0.071s} fxg5 {0.045s}
+37. Rf3+ {0.017s} Ke7 {0.018s} 38. Qf8+ {0.008s} Kd7 {0.003s}
+39. Rf7# {0.003s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.04.04"]
+[Round "1"]
+[White "EngineA"]
+[Black "EngineB"]
+[Result "1-0"]
+[ECO "A04"]
+[GameDuration "00:00:12"]
+[GameEndTime "2026-04-04T19:23:24.499 GMT+1"]
+[GameStartTime "2026-04-04T19:23:12.376 GMT+1"]
+[Opening "Reti Opening"]
+[PlyCount "105"]
+[TimeControl "3+0.1"]
+
+1. Nf3 {0.010s} Nc6 {0.009s} 2. d4 {0.025s} d5 {0.058s} 3. Nc3 {0.047s}
+Nf6 {0.11s} 4. Be3 {0.17s} Ng4 {0.17s} 5. Bf4 {0.17s} Be6 {0.16s} 6. h3 {0.16s}
+Nf6 {0.16s} 7. Qd3 {0.16s} Qd7 {0.16s} 8. O-O-O {0.16s} h6 {0.15s} 9. g4 {0.15s}
+g5 {0.15s} 10. Bg3 {0.15s} Bg7 {0.15s} 11. Ne5 {0.15s} Nb4 {0.15s}
+12. Qe3 {0.15s} Qd8 {0.14s} 13. a3 {0.14s} Nc6 {0.14s} 14. Nxc6 {0.14s}
+bxc6 {0.14s} 15. Bg2 {0.14s} Qd7 {0.14s} 16. Na4 {0.14s} Qd8 {0.14s}
+17. Nc5 {0.14s} Bc8 {0.13s} 18. f4 {0.13s} gxf4 {0.13s} 19. Bxf4 {0.13s}
+Nd7 {0.13s} 20. Nd3 {0.13s} Bb7 {0.13s} 21. g5 {0.13s} h5 {0.13s}
+22. Rhe1 {0.13s} Nb6 {0.13s} 23. Nc5 {0.13s} Bc8 {0.13s} 24. Qg3 {0.13s}
+h4 {0.12s} 25. Qh2 {0.12s} e6 {0.12s} 26. Qg1 {0.12s} Nc4 {0.12s}
+27. Qf2 {0.12s} Qe7 {0.12s} 28. c3 {0.12s} Kf8 {0.12s} 29. Kc2 {0.12s}
+Rb8 {0.12s} 30. Nd3 {0.12s} Kg8 {0.12s} 31. a4 {0.12s} Nd6 {0.12s}
+32. Bf3 {0.12s} Ba6 {0.12s} 33. Nc5 {0.12s} Bc8 {0.12s} 34. b4 {0.12s}
+Rh7 {0.11s} 35. Qe3 {0.11s} Nc4 {0.11s} 36. Qd3 {0.11s} e5 {0.11s}
+37. Bxe5 {0.11s} Bxe5 {0.11s} 38. g6 {0.11s} fxg6 {0.11s} 39. Qxg6+ {0.11s}
+Bg7 {0.11s} 40. e4 {0.11s} Bxh3 {0.11s} 41. Qxc6 {0.11s} dxe4 {0.11s}
+42. Bxe4 {0.11s} Na3+ {0.11s} 43. Kb3 {0.11s} Rh6 {0.11s} 44. Bd5+ {0.11s}
+Kf8 {0.11s} 45. Rxe7 {0.11s} Rxc6 {0.11s} 46. Rf7+ {0.11s} Ke8 {0.077s}
+47. Rxg7 {0.085s} Rcb6 {0.11s} 48. Re1+ {0.046s} Be6 {0.080s} 49. Nxe6 {0.038s}
+Rxb4+ {0.11s} 50. cxb4 {0.028s} Rxb4+ {0.080s} 51. Kxa3 {0.066s} Rb3+ {0.015s}
+52. Kxb3 {0.014s} h3 {0.030s} 53. Bc6# {0.12s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.04.04"]
+[Round "1"]
+[White "EngineB"]
+[Black "EngineA"]
+[Result "1-0"]
+[ECO "A04"]
+[GameDuration "00:00:08"]
+[GameEndTime "2026-04-04T19:23:32.599 GMT+1"]
+[GameStartTime "2026-04-04T19:23:24.500 GMT+1"]
+[Opening "Reti Opening"]
+[PlyCount "77"]
+[TimeControl "3+0.1"]
+
+1. Nf3 {0.010s} Nc6 {0.010s} 2. d4 {0.024s} d5 {0.058s} 3. Nc3 {0.048s}
+Nf6 {0.10s} 4. Be3 {0.17s} Ng4 {0.17s} 5. Bg5 {0.17s} Bf5 {0.16s} 6. Qd2 {0.16s}
+f6 {0.16s} 7. Bh4 {0.16s} Nb4 {0.16s} 8. Rc1 {0.16s} g5 {0.15s} 9. Bg3 {0.15s}
+Kf7 {0.15s} 10. h3 {0.15s} Nh6 {0.15s} 11. Nb5 {0.15s} Nxa2 {0.15s}
+12. Ra1 {0.15s} g4 {0.14s} 13. hxg4 {0.14s} Bxg4 {0.14s} 14. Rxa2 {0.14s}
+c6 {0.14s} 15. Nxa7 {0.14s} Nf5 {0.14s} 16. Qf4 {0.14s} h5 {0.14s}
+17. c3 {0.14s} Qb6 {0.13s} 18. Qc7 {0.13s} Qb3 {0.13s} 19. Qa5 {0.13s}
+b6 {0.13s} 20. Qa6 {0.13s} Nxg3 {0.13s} 21. fxg3 {0.13s} Bc8 {0.13s}
+22. Qa3 {0.13s} Qxa3 {0.13s} 23. Rxa3 {0.13s} e6 {0.13s} 24. Nxc8 {0.13s}
+Bxa3 {0.094s} 25. Nxb6 {0.039s} Ra6 {0.048s} 26. bxa3 {0.035s} Rxb6 {0.062s}
+27. g4 {0.044s} Ra8 {0.13s} 28. gxh5 {0.10s} Rxa3 {0.055s} 29. Rh3 {0.082s}
+Rbb3 {0.061s} 30. h6 {0.10s} Rxc3 {0.065s} 31. h7 {0.040s} Rc1+ {0.094s}
+32. Kd2 {0.035s} Rxf1 {0.11s} 33. h8=Q {0.034s} Ra2+ {0.084s} 34. Kc3 {0.11s}
+Rc1+ {0.12s} 35. Kb3 {0.14s} Rxe2 {0.078s} 36. Ng5+ {0.073s} fxg5 {0.044s}
+37. Rf3+ {0.018s} Ke7 {0.019s} 38. Qf8+ {0.008s} Kd7 {0.004s}
+39. Rf7# {0.004s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.04.04"]
+[Round "1"]
+[White "EngineA"]
+[Black "EngineB"]
+[Result "1-0"]
+[ECO "A04"]
+[GameDuration "00:00:08"]
+[GameEndTime "2026-04-04T19:23:40.709 GMT+1"]
+[GameStartTime "2026-04-04T19:23:32.600 GMT+1"]
+[Opening "Reti Opening"]
+[PlyCount "77"]
+[TimeControl "3+0.1"]
+
+1. Nf3 {0.009s} Nc6 {0.009s} 2. d4 {0.024s} d5 {0.057s} 3. Nc3 {0.048s}
+Nf6 {0.10s} 4. Be3 {0.17s} Ng4 {0.17s} 5. Bg5 {0.17s} Bf5 {0.16s} 6. Qd2 {0.16s}
+f6 {0.16s} 7. Bh4 {0.16s} Nb4 {0.16s} 8. Rc1 {0.16s} g5 {0.15s} 9. Bg3 {0.15s}
+Kf7 {0.15s} 10. h3 {0.15s} Nh6 {0.15s} 11. Nb5 {0.15s} Nxa2 {0.15s}
+12. Ra1 {0.15s} g4 {0.14s} 13. hxg4 {0.14s} Bxg4 {0.14s} 14. Rxa2 {0.14s}
+c6 {0.14s} 15. Nxa7 {0.14s} Nf5 {0.14s} 16. Qf4 {0.14s} h5 {0.14s}
+17. c3 {0.14s} Qb6 {0.13s} 18. Qc7 {0.13s} Qb3 {0.13s} 19. Qa5 {0.13s}
+b6 {0.13s} 20. Qa6 {0.13s} Nxg3 {0.13s} 21. fxg3 {0.13s} Bc8 {0.13s}
+22. Qa3 {0.13s} Qxa3 {0.13s} 23. Rxa3 {0.13s} e6 {0.13s} 24. Nxc8 {0.13s}
+Bxa3 {0.098s} 25. Nxb6 {0.051s} Ra6 {0.050s} 26. bxa3 {0.035s} Rxb6 {0.060s}
+27. g4 {0.047s} Ra8 {0.13s} 28. gxh5 {0.10s} Rxa3 {0.055s} 29. Rh3 {0.082s}
+Rbb3 {0.060s} 30. h6 {0.10s} Rxc3 {0.064s} 31. h7 {0.032s} Rc1+ {0.095s}
+32. Kd2 {0.035s} Rxf1 {0.11s} 33. h8=Q {0.035s} Ra2+ {0.081s} 34. Kc3 {0.11s}
+Rc1+ {0.12s} 35. Kb3 {0.14s} Rxe2 {0.079s} 36. Ng5+ {0.071s} fxg5 {0.044s}
+37. Rf3+ {0.018s} Ke7 {0.019s} 38. Qf8+ {0.009s} Kd7 {0.003s}
+39. Rf7# {0.004s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.04.04"]
+[Round "1"]
+[White "EngineB"]
+[Black "EngineA"]
+[Result "1-0"]
+[ECO "A04"]
+[GameDuration "00:00:08"]
+[GameEndTime "2026-04-04T19:23:48.785 GMT+1"]
+[GameStartTime "2026-04-04T19:23:40.710 GMT+1"]
+[Opening "Reti Opening"]
+[PlyCount "77"]
+[TimeControl "3+0.1"]
+
+1. Nf3 {0.010s} Nc6 {0.009s} 2. d4 {0.025s} d5 {0.058s} 3. Nc3 {0.048s}
+Nf6 {0.10s} 4. Be3 {0.17s} Ng4 {0.17s} 5. Bg5 {0.17s} Bf5 {0.16s} 6. Qd2 {0.16s}
+f6 {0.16s} 7. Bh4 {0.16s} Nb4 {0.16s} 8. Rc1 {0.16s} g5 {0.15s} 9. Bg3 {0.15s}
+Kf7 {0.15s} 10. h3 {0.15s} Nh6 {0.15s} 11. Nb5 {0.15s} Nxa2 {0.15s}
+12. Ra1 {0.15s} g4 {0.14s} 13. hxg4 {0.14s} Bxg4 {0.14s} 14. Rxa2 {0.14s}
+c6 {0.14s} 15. Nxa7 {0.14s} Nf5 {0.14s} 16. Qf4 {0.14s} h5 {0.14s}
+17. c3 {0.14s} Qb6 {0.13s} 18. Qc7 {0.13s} Qb3 {0.13s} 19. Qa5 {0.13s}
+b6 {0.13s} 20. Qa6 {0.13s} Nxg3 {0.13s} 21. fxg3 {0.13s} Bc8 {0.13s}
+22. Qa3 {0.13s} Qxa3 {0.13s} 23. Rxa3 {0.13s} e6 {0.13s} 24. Nxc8 {0.13s}
+Bxa3 {0.096s} 25. Nxb6 {0.040s} Ra6 {0.047s} 26. bxa3 {0.035s} Rxb6 {0.060s}
+27. g4 {0.044s} Ra8 {0.13s} 28. gxh5 {0.10s} Rxa3 {0.055s} 29. Rh3 {0.082s}
+Rbb3 {0.060s} 30. h6 {0.10s} Rxc3 {0.064s} 31. h7 {0.032s} Rc1+ {0.093s}
+32. Kd2 {0.035s} Rxf1 {0.11s} 33. h8=Q {0.034s} Ra2+ {0.081s} 34. Kc3 {0.10s}
+Rc1+ {0.12s} 35. Kb3 {0.14s} Rxe2 {0.077s} 36. Ng5+ {0.070s} fxg5 {0.043s}
+37. Rf3+ {0.018s} Ke7 {0.019s} 38. Qf8+ {0.008s} Kd7 {0.004s}
+39. Rf7# {0.003s, White mates} 1-0
+
