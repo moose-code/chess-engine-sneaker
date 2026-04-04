@@ -126,8 +126,13 @@ pub fn run_uci_loop() {
                         _ => {}
                     }
                 }
+                // movetime 0 makes the deadline immediate → no search → bestmove 0000 → GUI forfeit.
                 if let Some(ms) = movetime_ms {
-                    search.set_deadline_after(Duration::from_millis(ms));
+                    if ms > 0 {
+                        search.set_deadline_after(Duration::from_millis(ms));
+                    } else {
+                        search.set_deadline(None);
+                    }
                 } else if let (Some(wt), Some(bt)) = (wtime, btime) {
                     let wi = winc.unwrap_or(0);
                     let bi = binc.unwrap_or(0);
@@ -135,9 +140,14 @@ pub fn run_uci_loop() {
                         Color::White => wt.saturating_add(wi),
                         Color::Black => bt.saturating_add(bi),
                     };
-                    let time_for_move =
-                        (my_time / 40).max(50).min(my_time.saturating_sub(50));
-                    search.set_deadline_after(Duration::from_millis(time_for_move));
+                    // Old formula (my_time/40).max(50).min(my_time.saturating_sub(50)) hits 0 when
+                    // my_time < 50 → instant timeout → bestmove 0000 / "disconnects".
+                    if my_time == 0 {
+                        search.set_deadline(None);
+                    } else {
+                        let slice = (my_time / 20).max(1).min(my_time);
+                        search.set_deadline_after(Duration::from_millis(slice));
+                    }
                 } else {
                     search.set_deadline(None);
                 }
@@ -145,7 +155,13 @@ pub fn run_uci_loop() {
                     writeln!(out, "info score cp {}", sc).ok();
                     writeln!(out, "bestmove {}", bm.to_uci()).ok();
                 } else {
-                    writeln!(out, "bestmove 0000").ok();
+                    let mut buf = Vec::with_capacity(256);
+                    MoveGen::gen_legal(&mut buf, &board);
+                    if let Some(m) = buf.first() {
+                        writeln!(out, "bestmove {}", m.to_uci()).ok();
+                    } else {
+                        writeln!(out, "bestmove 0000").ok();
+                    }
                 }
             }
             "perft" => {
