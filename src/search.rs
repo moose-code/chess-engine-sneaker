@@ -3,7 +3,7 @@
 use crate::board::{Board, NullMoveUndo};
 use crate::eval::{evaluate, EvalWeights};
 use crate::movegen::MoveGen;
-use crate::types::{Color, Move, PieceType};
+use crate::types::{Color, Move, PieceType, Square};
 use std::time::{Duration, Instant};
 
 const TT_EXACT: u8 = 0;
@@ -192,6 +192,66 @@ impl Search {
         false
     }
 
+    fn least_attacker_legal(&self, b: &mut Board, target: Square) -> Option<Move> {
+        let mut buf = Vec::with_capacity(128);
+        MoveGen::gen_pseudo_legal(&mut buf, b);
+        let side = b.side_to_move();
+        let mut best: Option<Move> = None;
+        let mut best_v = i32::MAX;
+        for m in buf {
+            if m.to_sq() != target {
+                continue;
+            }
+            if !m.is_en_passant() && b.piece_at(target).is_none() {
+                continue;
+            }
+            let Some(att) = b.piece_at(m.from_sq()) else {
+                continue;
+            };
+            if att.pt == PieceType::King {
+                continue;
+            }
+            let u = b.make_move(m);
+            let illegal = b.sq_attacked(b.king_sq(side), side.flip());
+            b.unmake(u);
+            if illegal {
+                continue;
+            }
+            let v = piece_value_cp(att.pt);
+            if v < best_v {
+                best_v = v;
+                best = Some(m);
+            }
+        }
+        best
+    }
+
+    fn see_rec(&self, b: &mut Board, target: Square) -> i32 {
+        let Some(on_target) = b.piece_at(target) else {
+            return 0;
+        };
+        let gain = piece_value_cp(on_target.pt);
+        let Some(m) = self.least_attacker_legal(b, target) else {
+            return 0;
+        };
+        let u = b.make_move(m);
+        let reply = self.see_rec(b, target);
+        b.unmake(u);
+        (gain - reply).max(0)
+    }
+
+    fn see_capture_score(&self, b: &Board, m: Move) -> i32 {
+        if !m.is_en_passant() && b.piece_at(m.to_sq()).is_none() {
+            return 0;
+        }
+        let mut tmp = b.clone();
+        let gain0 = capture_value_cp(&tmp, m);
+        let u = tmp.make_move(m);
+        let reply = self.see_rec(&mut tmp, m.to_sq());
+        tmp.unmake(u);
+        gain0 - reply
+    }
+
     /// Quiescence: noisy moves only when not in check; all evasions when in check.
     /// `qdepth` limits capture chains; check evasions ignore the cutoff.
     fn quiesce(
@@ -249,6 +309,17 @@ impl Search {
 
         let next_q = if in_check { qdepth } else { qdepth - 1 };
         for m in buf {
+            if !in_check {
+                let see = self.see_capture_score(b, m);
+                if see < -60 {
+                    continue;
+                }
+                let cap = capture_value_cp(b, m);
+                let stand = evaluate(b, &self.weights);
+                if stand + cap + 40 <= alpha {
+                    continue;
+                }
+            }
             let u = b.make_move(m);
             let sc = -self.quiesce(b, -beta, -alpha, ply + 1, next_q);
             b.unmake(u);
@@ -367,7 +438,9 @@ impl Search {
                 let f = m.from_sq().0 as usize;
                 let t = m.to_sq().0 as usize;
                 score -= self.history[f][t];
-                if let Some(v) = b.piece_at(m.to_sq()) {
+                if m.is_en_passant() {
+                    score -= 10_000;
+                } else if let Some(v) = b.piece_at(m.to_sq()) {
                     let a = b
                         .piece_at(m.from_sq())
                         .map(|p| p.pt)
@@ -396,6 +469,32 @@ impl Search {
             };
             if gives_check {
                 full_depth += 1;
+            }
+            // Basic singular extension: if TT move looks uniquely strong, extend one ply.
+            if Some(m) == tt_move && depth >= 6 && te.key == key && te.depth as i32 >= depth - 2 {
+                let bound = score_from_tt(te.score, ply) - 35;
+                let mut rival_found = false;
+                let mut alt = Vec::with_capacity(64);
+                MoveGen::gen_legal(&mut alt, b);
+                for x in alt {
+                    if x == m {
+                        continue;
+                    }
+                    let ux = b.make_move(x);
+                    let xv =
+                        -self.negamax(b, depth - 3, -bound, -bound + 1, ply + 1, Some(x), true, killers);
+                    b.unmake(ux);
+                    if self.stop {
+                        break;
+                    }
+                    if xv >= bound {
+                        rival_found = true;
+                        break;
+                    }
+                }
+                if !rival_found && !self.stop {
+                    full_depth += 1;
+                }
             }
             let mut search_depth = full_depth;
             let can_lmr = move_no > 3
@@ -615,4 +714,24 @@ fn piece_cap_val(pt: PieceType) -> i32 {
         PieceType::Queen => 9,
         PieceType::King => 0,
     }
+}
+
+fn piece_value_cp(pt: PieceType) -> i32 {
+    match pt {
+        PieceType::Pawn => 100,
+        PieceType::Knight => 320,
+        PieceType::Bishop => 330,
+        PieceType::Rook => 500,
+        PieceType::Queen => 900,
+        PieceType::King => 20_000,
+    }
+}
+
+fn capture_value_cp(b: &Board, m: Move) -> i32 {
+    if m.is_en_passant() {
+        return piece_value_cp(PieceType::Pawn);
+    }
+    b.piece_at(m.to_sq())
+        .map(|p| piece_value_cp(p.pt))
+        .unwrap_or(0)
 }
