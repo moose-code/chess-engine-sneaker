@@ -62,6 +62,9 @@ pub struct Search {
     pub weights: EvalWeights,
     threads: usize,
     nnue: Option<NnueModel>,
+    use_see_prune: bool,
+    use_singular: bool,
+    use_smp_root: bool,
     tt: Vec<TtEntry>,
     tt_mask: usize,
     history: [[i32; 64]; 64],
@@ -85,6 +88,9 @@ impl Search {
             weights: EvalWeights::default(),
             threads: 1,
             nnue: None,
+            use_see_prune: true,
+            use_singular: false,
+            use_smp_root: true,
             tt: vec![TtEntry::default(); n],
             tt_mask: n - 1,
             history: [[0; 64]; 64],
@@ -107,6 +113,18 @@ impl Search {
 
     pub fn set_nnue(&mut self, model: Option<NnueModel>) {
         self.nnue = model;
+    }
+
+    pub fn set_use_see_prune(&mut self, on: bool) {
+        self.use_see_prune = on;
+    }
+
+    pub fn set_use_singular(&mut self, on: bool) {
+        self.use_singular = on;
+    }
+
+    pub fn set_use_smp_root(&mut self, on: bool) {
+        self.use_smp_root = on;
     }
 
     #[inline]
@@ -338,14 +356,16 @@ impl Search {
         let next_q = if in_check { qdepth } else { qdepth - 1 };
         for m in buf {
             if !in_check {
-                let see = self.see_capture_score(b, m);
-                if see < -60 {
-                    continue;
-                }
-                let cap = capture_value_cp(b, m);
-                let stand = evaluate(b, &self.weights);
-                if stand + cap + 40 <= alpha {
-                    continue;
+                if self.use_see_prune {
+                    let see = self.see_capture_score(b, m);
+                    if see < -60 {
+                        continue;
+                    }
+                    let cap = capture_value_cp(b, m);
+                    let stand = evaluate(b, &self.weights);
+                    if stand + cap + 40 <= alpha {
+                        continue;
+                    }
                 }
             }
             let u = b.make_move(m);
@@ -510,7 +530,12 @@ impl Search {
                 full_depth += 1;
             }
             // Basic singular extension: if TT move looks uniquely strong, extend one ply.
-            if Some(m) == tt_move && depth >= 6 && te.key == key && te.depth as i32 >= depth - 2 {
+            if self.use_singular
+                && Some(m) == tt_move
+                && depth >= 6
+                && te.key == key
+                && te.depth as i32 >= depth - 2
+            {
                 let bound = score_from_tt(te.score, ply) - 35;
                 let mut rival_found = false;
                 let mut alt = Vec::with_capacity(64);
@@ -652,7 +677,7 @@ impl Search {
     }
 
     pub fn best_move(&mut self, b: &mut Board, max_depth: i32) -> Option<(Move, i32)> {
-        if self.threads > 1 {
+        if self.use_smp_root && self.threads > 1 {
             return self.best_move_smp(b, max_depth);
         }
         self.nodes = 0;

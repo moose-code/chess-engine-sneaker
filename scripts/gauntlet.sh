@@ -32,6 +32,8 @@ WEIGHTS_A=""
 WEIGHTS_B=""
 TB_PATH=""
 TB_PIECES=6
+ENGINE_A_OPTS=""
+ENGINE_B_OPTS=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -53,6 +55,8 @@ while [[ $# -gt 0 ]]; do
     --weights-b) WEIGHTS_B="$2"; shift 2 ;;
     --tb-path) TB_PATH="$2"; shift 2 ;;
     --tb-pieces) TB_PIECES="$2"; shift 2 ;;
+    --engine-a-options) ENGINE_A_OPTS="$2"; shift 2 ;;
+    --engine-b-options) ENGINE_B_OPTS="$2"; shift 2 ;;
     *)
       echo "Unknown argument: $1" >&2
       exit 1
@@ -107,12 +111,30 @@ fi
 if [[ -n "$WEIGHTS_B" ]]; then
   WEIGHT_OPT_B=( option.EvalWeightsFile="$WEIGHTS_B" )
 fi
+EXTRA_A=()
+EXTRA_B=()
+if [[ -n "$ENGINE_A_OPTS" ]]; then
+  IFS=',' read -r -a arr <<< "$ENGINE_A_OPTS"
+  for kv in "${arr[@]}"; do
+    kv="$(echo "$kv" | xargs)"
+    [[ -z "$kv" ]] && continue
+    EXTRA_A+=( "option.$kv" )
+  done
+fi
+if [[ -n "$ENGINE_B_OPTS" ]]; then
+  IFS=',' read -r -a arr <<< "$ENGINE_B_OPTS"
+  for kv in "${arr[@]}"; do
+    kv="$(echo "$kv" | xargs)"
+    [[ -z "$kv" ]] && continue
+    EXTRA_B+=( "option.$kv" )
+  done
+fi
 
 "$CLI" \
   -engine cmd="$ENGINE_A" dir="$ENGINE_A_DIR" proto=uci name="$ENGINE_A_NAME" \
-    option.Threads="$THREADS_A" option.Hash="$HASH_A" ${WEIGHT_OPT_A[@]+"${WEIGHT_OPT_A[@]}"} \
+    option.Threads="$THREADS_A" option.Hash="$HASH_A" ${WEIGHT_OPT_A[@]+"${WEIGHT_OPT_A[@]}"} ${EXTRA_A[@]+"${EXTRA_A[@]}"} \
   -engine cmd="$ENGINE_B" dir="$ENGINE_B_DIR" proto=uci name="$ENGINE_B_NAME" \
-    option.Threads="$THREADS_B" option.Hash="$HASH_B" ${WEIGHT_OPT_B[@]+"${WEIGHT_OPT_B[@]}"} \
+    option.Threads="$THREADS_B" option.Hash="$HASH_B" ${WEIGHT_OPT_B[@]+"${WEIGHT_OPT_B[@]}"} ${EXTRA_B[@]+"${EXTRA_B[@]}"} \
   -each tc="$TC" \
   -games "$GAMES" -repeat \
   -openings file="$OPENINGS_FILE" format=pgn order=random plies=16 \

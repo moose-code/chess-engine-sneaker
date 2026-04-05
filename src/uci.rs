@@ -48,6 +48,21 @@ pub fn run_uci_loop() {
                     "option name NnueFile type string default <empty>"
                 )
                 .ok();
+                writeln!(
+                    out,
+                    "option name UseSeePrune type check default true"
+                )
+                .ok();
+                writeln!(
+                    out,
+                    "option name UseSingular type check default false"
+                )
+                .ok();
+                writeln!(
+                    out,
+                    "option name UseSmpRoot type check default true"
+                )
+                .ok();
                 writeln!(out, "uciok").ok();
             }
             "isready" => {
@@ -125,6 +140,36 @@ pub fn run_uci_loop() {
                 {
                     let path = tok[4..].join(" ");
                     search.set_nnue(NnueModel::load(path.trim()));
+                } else if tok.len() >= 5
+                    && tok[1] == "name"
+                    && tok[2] == "UseSeePrune"
+                    && tok[3] == "value"
+                {
+                    let on = matches!(
+                        tok[4].to_ascii_lowercase().as_str(),
+                        "true" | "1" | "yes" | "on"
+                    );
+                    search.set_use_see_prune(on);
+                } else if tok.len() >= 5
+                    && tok[1] == "name"
+                    && tok[2] == "UseSingular"
+                    && tok[3] == "value"
+                {
+                    let on = matches!(
+                        tok[4].to_ascii_lowercase().as_str(),
+                        "true" | "1" | "yes" | "on"
+                    );
+                    search.set_use_singular(on);
+                } else if tok.len() >= 5
+                    && tok[1] == "name"
+                    && tok[2] == "UseSmpRoot"
+                    && tok[3] == "value"
+                {
+                    let on = matches!(
+                        tok[4].to_ascii_lowercase().as_str(),
+                        "true" | "1" | "yes" | "on"
+                    );
+                    search.set_use_smp_root(on);
                 }
             }
             "go" => {

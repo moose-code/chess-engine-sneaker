@@ -28,6 +28,18 @@ scripts/gauntlet.sh \
 
 If `stockfish` is not on PATH, pass an absolute path in `--engine-b`.
 
+To benchmark against a real Stockfish 2500 setting:
+
+```bash
+scripts/gauntlet.sh \
+  --engine-a "./target/release/incremental-chess-engine" \
+  --engine-a-name "Sneaker" \
+  --engine-b "stockfish" \
+  --engine-b-name "SF2500" \
+  --engine-b-options "UCI_LimitStrength=true,UCI_Elo=2500" \
+  --games 200 --tc "3+0.1" --threads-a 4 --threads-b 4
+```
+
 ## 3) Compare two local revisions (A/B)
 
 - Check out revision A, build, copy binary to `benchmarks/bin/engine-a`.
@@ -82,3 +94,17 @@ scripts/ab_accept.sh \
 ```
 
 Accept only if Elo is positive and LOS clears the threshold.
+
+## 7) Per-engine UCI option overrides
+
+`gauntlet.sh` supports comma-separated per-engine option overrides:
+
+- `--engine-a-options "Key1=Val1,Key2=Val2"`
+- `--engine-b-options "Key1=Val1,Key2=Val2"`
+
+Examples:
+
+- Disable singular extension for Sneaker:
+  `--engine-a-options "UseSingular=false"`
+- Match Stockfish at a target Elo:
+  `--engine-b-options "UCI_LimitStrength=true,UCI_Elo=2500"`
